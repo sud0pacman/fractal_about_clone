@@ -14,6 +14,20 @@ impl SimpleComponent for App {
             set_default_size: (400, 300),
         }
     }
+    
+    type Root;
+    
+    fn init_root() -> Self::Root {
+        todo!()
+    }
+    
+    fn init(
+        init: Self::Init,
+        root: Self::Root,
+        sender: ComponentSender<Self>,
+    ) -> ComponentParts<Self> {
+        todo!()
+    }
 }
 
 fn main() {
