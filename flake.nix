@@ -2,10 +2,7 @@
   description = "About sahifaga taqlid";
   
   inputs = {
-     # Fresh and new for testing
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-
-    # The flake-utils library
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11"; 
     flake-utils.url = "github:numtide/flake-utils";
   };
 
