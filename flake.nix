@@ -1,46 +1,44 @@
 {
-  description = "About sahifaga taqlid";
-  
+  description = "Fractal About Clone (Relm4 + GTK4)";
+
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11"; 
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     flake-utils.url = "github:numtide/flake-utils";
+    rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, rust-overlay }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ rust-overlay.overlays.default ];
+        };
+
+        rustToolchain = pkgs.rust-bin.stable."1.92.0".default;
       in
       {
         devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            rustc
-            cargo
-            rustfmt
-            clippy
-            rust-analyzer  #(IDE uchun)
+          name = "relm4-dev-shell";
+
+          packages = with pkgs; [
+            rustToolchain
+            rust-analyzer
+            pkg-config
+            openssl
+            gtk4
+            glib
+            gobject-introspection
           ];
 
-          # ixtiyoriy: muhit o'zgaruvchilari
-          RUST_LOG = "info";
-        };
-
-        # ixtiyoriy: loyihani yig'ish (nix build)
-        packages.default = pkgs.stdenv.mkDerivation {
-          pname = "fract_about_clone";
-          version = "0.1.0";
-
-          src = ./.;
-
-          nativeBuildInputs = with pkgs; [ rustPlatform.cargoSetupHook ];
-          buildInputs = with pkgs; [ rustc cargo ];
-
-          installPhase = ''
-            mkdir -p $out/bin
-            cp target/release/fractal_about_clone $out/bin/
+          shellHook = ''
+            export PATH=${rustToolchain}/bin:$PATH
+            echo "Using rustc from: $(which rustc)"
+            rustc --version
           '';
+
+          RUST_BACKTRACE = "1";
         };
       }
     );
-
 }
