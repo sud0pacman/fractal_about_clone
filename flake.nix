@@ -1,43 +1,28 @@
-# flake.nix
 {
-  description = "iloncha — Rust loyihasi";
+  description = "Rust loyiha (Nix + VS Code friendly)";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11"; 
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     flake-utils.url = "github:numtide/flake-utils";
+    rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, rust-overlay }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        overlays = [ rust-overlay.overlays.default ];
+        pkgs = import nixpkgs { inherit system overlays; };
+
+        rust = pkgs.rust-bin.stable.latest.default;
       in
       {
         devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            rustc
-            cargo
-            rustfmt
-            clippy
-            rust-analyzer  #(IDE uchun)
-
-            pkg-config
-            gtk4
+          packages = [
+            rust
+            pkgs.rust-analyzer
+            pkgs.pkg-config
+            pkgs.gtk4
           ];
-
-          # ixtiyoriy: muhit o'zgaruvchilari
-          RUST_LOG = "info";
-        };
-
-        # ixtiyoriy: loyihani yig'ish (nix build)
-        packages.default = pkgs.stdenv.mkDerivation {
-          pname = "iloncha";
-          version = "0.1.0";
-
-          src = ./.;
-
-          nativeBuildInputs = with pkgs; [ rustPlatform.cargoSetupHook ];
-          buildInputs = with pkgs; [ rustc cargo ];
         };
       }
     );
