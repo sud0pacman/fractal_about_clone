@@ -1,62 +1,108 @@
+use gtk::prelude::*;
+use relm4::adw::prelude::*;
 use relm4::prelude::*;
 
-struct App;
+#[derive(Debug)]
+enum AppMsg {
+    ToggleSidebar,
+    SetVisibleSidebar,
+}
+
+#[tracker::track]
+struct AppModel {
+    sidebar_width: i32,
+    sidebar_visible: bool,
+}
 
 #[relm4::component]
-impl SimpleComponent for App {
+impl SimpleComponent for AppModel {
     type Init = ();
-    type Input = ();
+    type Input = AppMsg;
     type Output = ();
-    type Root = ();
 
     view! {
-        gtk::Window {
-            set_title: Some("Fractal About Clone"),
-            set_default_size: (400, 300),
+        adw::ApplicationWindow {
+            set_default_width: 600,
+            set_default_height: 400,
 
-            gtk::Box {
-                set_orientation: gtk::Orientation::Vertical,
-                set_margin_all: 5,
-                set_spacing: 5,
-
-                gtk::Button {
-                    set_label: "Increment",
-                    connect_clicked => Msg::Increment,
-                    // ActionablePlus::set_action::<ExampleU8Action>: 1,
+            #[wrap(Some)]
+            set_content = &adw::OverlaySplitView
+            {
+                #[track(model.changed(AppModel::sidebar_visible()))]
+                set_show_sidebar: model.sidebar_visible,
+                #[wrap(Some)]
+                set_sidebar = &gtk::Box {
+                    #[track(model.changed(AppModel::sidebar_width()))]
+                    set_width_request: model.sidebar_width,
+                    set_orientation: gtk::Orientation::Vertical,
+                    set_spacing: 12,
+                    set_margin_all: 12,
+                    append = &gtk::Button
+                    {
+                        set_label: "Resize of Sidebar",
+                        connect_clicked[sender] => move |_| {
+                            sender.input(AppMsg::ToggleSidebar);
+                        }
+                    },
+                },
+                #[wrap(Some)]
+                set_content = &adw::ToolbarView
+                {
+                    add_top_bar = &adw::HeaderBar
+                    {
+                        set_show_title: false,
+                    },
+                    #[wrap(Some)]
+                    set_content = &gtk::Box {
+                        set_orientation: gtk::Orientation::Vertical,
+                        append =  &gtk::Button
+                        {
+                            set_label: "Set Visible of Sidebar",
+                            connect_clicked[sender] => move |_| {
+                                sender.input(AppMsg::SetVisibleSidebar);
+                            },
+                            set_halign: gtk::Align::Center,
+                            set_hexpand: false,
+                            set_width_request: 150,
+                        }
+                    }
                 },
 
-                gtk::Button::with_label("Decrement") {
-                    connect_clicked => Msg::Decrement,
-                },
-
-                gtk::Label {
-                    set_margin_all: 5,
-                    #[watch]
-                    set_label: &format!("Counter: {}", model.counter),
-                },
-
-                gtk::MenuButton {
-                    set_menu_model: Some(&menu_model),
-                }
-            },
+            }
         }
     }
-    
-    
-    fn init_root() -> Self::Root {
-        todo!()
+    fn update(&mut self, msg: AppMsg, _sender: ComponentSender<Self>) {
+        // reset tracker value of the model
+        self.reset();
+        match msg {
+            AppMsg::ToggleSidebar => {
+                self.set_sidebar_width(if self.sidebar_width == 200 { 50 } else { 200 });
+                // if current width is 200 -> set to 50, otherwise set to 200
+            }
+            AppMsg::SetVisibleSidebar => {
+                self.set_sidebar_visible(!self.sidebar_visible);
+                // if visible -> hide, if hidden -> show
+            }
+        }
     }
-    
+
     fn init(
-        init: Self::Init,
+        _: Self::Init,
         root: Self::Root,
         sender: ComponentSender<Self>,
     ) -> ComponentParts<Self> {
-        todo!()
+        let model = AppModel {
+            sidebar_width: 200,
+            sidebar_visible: true,
+        };
+
+        let widgets = view_output!();
+
+        ComponentParts { model, widgets }
     }
 }
 
 fn main() {
-    let app = RelmApp::new("org.example.fractal_about_clone");
-    app.run::<App>(());
+    let app = RelmApp::new("relm4.example.split_layout");
+    app.run::<AppModel>(());
 }

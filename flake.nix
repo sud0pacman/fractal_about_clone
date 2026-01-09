@@ -22,6 +22,7 @@
             pkgs.rust-analyzer
             pkgs.pkg-config
             pkgs.gtk4
+            pkgs.libadwaita
           ];
         };
       }
