@@ -1,29 +1,50 @@
 {
-  description = "Rust loyiha (Nix + VS Code friendly)";
+  description = "Relm4 loyihasi uchun ishlab chiqish muhiti";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
-    flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
+    utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, rust-overlay }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs = { self, nixpkgs, rust-overlay, utils }:
+    utils.lib.eachDefaultSystem (system:
       let
-        overlays = [ rust-overlay.overlays.default ];
-        pkgs = import nixpkgs { inherit system overlays; };
+        overlays = [ (import rust-overlay) ];
+        pkgs = import nixpkgs {
+          inherit system overlays;
+        };
 
-        rust = pkgs.rust-bin.stable.latest.default;
+        # Rust toolchain-ni tanlaymiz
+        rustToolchain = pkgs.rust-bin.stable.latest.default.override {
+          extensions = [ "rust-src" "rust-analyzer" ];
+        };
+
+        # GTK4 va Relm4 uchun kerakli paketlar
+        nativeBuildInputs = with pkgs; [
+          pkg-config
+          wrapGAppsHook4
+          rustToolchain
+        ];
+
+        buildInputs = with pkgs; [
+          gtk4
+          libadwaita
+          glib
+          pango
+          gdk-pixbuf
+          atk
+        ];
       in
       {
         devShells.default = pkgs.mkShell {
-          packages = [
-            rust
-            pkgs.rust-analyzer
-            pkgs.pkg-config
-            pkgs.gtk4
-            pkgs.libadwaita
-          ];
+          inherit nativeBuildInputs buildInputs;
+
+          # GTK bilan ishlashda muhim muhit o'zgaruvchilari
+          shellHook = ''
+            export XDG_DATA_DIRS=$GSETTINGS_SCHEMAS_PATH
+            echo "🦀 Relm4 (GTK4) muhiti tayyor!"
+          '';
         };
       }
     );
