@@ -34,6 +34,7 @@
           pango
           gdk-pixbuf
           atk
+          gettext
         ];
       in
       {
