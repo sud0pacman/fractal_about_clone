@@ -46,11 +46,14 @@ impl SimpleComponent for Header {
 
 #[derive(Debug)]
 enum AppMsg {
-    dialog: Controller<Dialog>,
+    AwesomeModel, Close
 }
 
+
+#[derive()]
 struct App {
     header: Controller<Header>,
+    dialog: Controller<AwesomeModel>,
 }
 
 #[relm4::component]
@@ -89,9 +92,7 @@ impl SimpleComponent for App {
 
                 gtk::Button {
                     set_label: "13",
-                    connect_clicked: move |_| {
-                        
-                    },
+                    connect_clicked => AppMsg::AwesomeModel,
                     add_css_class: "accent",
                     add_css_class: "pill",
                     set_halign: gtk::Align::Center,
@@ -123,14 +124,27 @@ impl SimpleComponent for App {
             .launch(())
             .forward(sender.input_sender(), identity);
 
-        let model = App { header };
+        let dialog = AwesomeModel::builder()
+            .launch(())
+            .forward(sender.input_sender(), |_| AppMsg::Close);
+        
+
+        let model = App { header, dialog };
+
         let widgets = view_output!();
 
         ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, _msg: Self::Input, _sender: ComponentSender<Self>) {
-        
+    fn update(&mut self, msg: Self::Input, _sender: ComponentSender<Self>) {
+        match msg {
+            AppMsg::AwesomeModel => {
+                self.dialog.emit(DialogMsg::Show);
+            }
+            AppMsg::Close => {
+                relm4::main_application().quit();
+            }
+        }   
     }
 }
 
@@ -154,13 +168,20 @@ use relm4::adw::prelude::*;
 use relm4::gtk;
 use relm4::prelude::*;
 
-#[derive(Debug, Clone, Copy)]
-pub struct AwesomeModel;
+#[derive(Debug)]
+pub enum DialogMsg {
+    Show,
+}
+
+#[derive(Debug, Clone)]
+pub struct AwesomeModel {
+    window: Option<adw::Dialog>,
+}
 
 #[relm4::component(pub)]
 impl SimpleComponent for AwesomeModel {
     type Init = ();
-    type Input = ();
+    type Input = DialogMsg;
     type Output = ();
 
     view! {
@@ -242,11 +263,23 @@ impl SimpleComponent for AwesomeModel {
         root: Self::Root,
         _sender: ComponentSender<Self>,
     ) -> ComponentParts<Self> {
-        let model = Self;
+        let model = AwesomeModel {
+            window: Some(root.clone()), 
+        };
+        
         let widgets = view_output!();
-        let window = relm4::main_application().active_window();
-        root.present(window.as_ref());
 
         ComponentParts { model, widgets }
+    }
+
+    fn update(&mut self, msg: Self::Input, _sender: ComponentSender<Self>) {
+        match msg {
+            DialogMsg::Show => {
+                if let Some(dialog) = &self.window {
+                    let parent = relm4::main_application().active_window();
+                    dialog.present(parent.as_ref());
+                }
+            }
+        }
     }
 }
