@@ -80,15 +80,10 @@ impl SimpleComponent for AwesomeModel {
                     gtk::ListBox {
                         add_css_class: "boxed-list",
                         set_margin_top: 30,
-
+                        set_selection_mode: gtk::SelectionMode::None,
+                        
                         adw::ActionRow {
-                            set_title: "Veb sayt",
-                            // set_activatable: true,
-                            // connect_activated => |_| {
-
-                            // },
-                            // set_subtitle: "Yagona interaktiv davlat xizmatlari portali",
-                            
+                            set_title: "Vebsayt",
                             add_suffix = &gtk::LinkButton {
                                 set_uri: "https://gitlab.gnome.org/World/fractal/",
                                 #[wrap(Some)]
@@ -102,7 +97,8 @@ impl SimpleComponent for AwesomeModel {
 
                     gtk::ListBox {
                         add_css_class: "boxed-list",
-                        set_margin_top: 20,
+                        set_margin_top: 18,
+                        set_selection_mode: gtk::SelectionMode::None,
                         
                         adw::ActionRow {
                             set_title: "Yordam uchuns savollar",
@@ -130,8 +126,9 @@ impl SimpleComponent for AwesomeModel {
                     },
 
                     gtk::ListBox {
+                        set_selection_mode: gtk::SelectionMode::None,
                         add_css_class: "boxed-list",
-                        set_margin_top: 20,
+                        set_margin_top: 18,
                         set_margin_bottom: 20,
                         
                         adw::ActionRow {

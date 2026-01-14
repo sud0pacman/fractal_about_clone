@@ -1,42 +1,7 @@
-use std::convert::identity;
-
 use relm4::{adw, gtk::prelude::*, prelude::*};
 
 mod dialog;
 use dialog::{AwesomeModel, DialogMsg};
-
-struct Header;
-
-#[relm4::component]
-impl SimpleComponent for Header {
-    type Init = ();
-    type Input = ();
-    type Output = AppMsg;
-
-    view! {
-        adw::HeaderBar {
-            #[wrap(Some)]
-            set_title_widget = &gtk::Box {
-                add_css_class: relm4::css::LINKED,
-
-                gtk::Label {
-                    set_label: ""
-                }
-            }
-        }
-    }
-
-    fn init(
-        _init: Self::Init,
-        root: Self::Root,
-        _sender: ComponentSender<Self>,
-    ) -> ComponentParts<Self> {
-        let model = Header;
-        let widgets = view_output!();
-
-        ComponentParts { model, widgets }
-    }
-}
 
 #[derive(Debug)]
 enum AppMsg {
@@ -45,7 +10,6 @@ enum AppMsg {
 }
 
 struct App {
-    header: Controller<Header>,
     dialog: Controller<AwesomeModel>,
 }
 
@@ -91,15 +55,11 @@ impl SimpleComponent for App {
         root: Self::Root,
         sender: ComponentSender<Self>,
     ) -> ComponentParts<Self> {
-        let header = Header::builder()
-            .launch(())
-            .forward(sender.input_sender(), identity);
-
         let dialog = AwesomeModel::builder()
             .launch(())
             .forward(sender.input_sender(), |_| AppMsg::Close);
 
-        let model = App { header, dialog };
+        let model = App { dialog };
 
         let widgets = view_output!();
 
