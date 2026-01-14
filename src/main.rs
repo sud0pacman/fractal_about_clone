@@ -72,44 +72,9 @@ impl SimpleComponent for App {
             gtk::Box {
                 set_orientation: gtk::Orientation::Vertical,
 
-                gtk::Image {
-                    set_vexpand: true,
-                    set_hexpand: true,
-                    set_paintable: Some(&embedded_logo()),
-                    set_pixel_size: 125
-                },
-
-                gtk::Label {
-                    set_label: "Fractal",
-                    add_css_class: css::classes::TITLE_1,
-                    set_margin_top: 10,
-                },
-
-                gtk::Label {
-                    set_label: "Fraktal jamoasi",
-                    set_margin_top: 10,
-                },
-
-                gtk::Button {
-                    set_label: "13",
-                    connect_clicked => AppMsg::AwesomeModel,
-                    add_css_class: "accent",
-                    add_css_class: "pill",
-                    set_halign: gtk::Align::Center,
-                    set_margin_top: 8,
-                    inline_css: "
-                        padding: 6px 20px; 
-                        min-height: 0px; 
-                        min-width: 0px;
-                        label { 
-                            margin: 0px; 
-                            padding: 0px; 
-                        }
-                    ",
-                },
-
                 gtk::LinkButton {
-                    set_label: "hi"
+                    set_label: "hi",
+                    connect_clicked => AppMsg::AwesomeModel,
                 },
             }
         }
@@ -162,11 +127,9 @@ fn embedded_logo() -> Texture {
 }
 
 
-
 use gettextrs::gettext;
 use relm4::adw::prelude::*;
 use relm4::gtk;
-use relm4::prelude::*;
 
 #[derive(Debug)]
 pub enum DialogMsg {
@@ -192,69 +155,70 @@ impl SimpleComponent for AwesomeModel {
 
             #[wrap(Some)]
             set_child = &adw::ToolbarView {
-                add_top_bar = &adw::HeaderBar,
+                add_top_bar = &adw::HeaderBar {},
 
                 #[wrap(Some)]
-                set_content = &adw::PreferencesPage {
-                    adw::PreferencesGroup {
-                        adw::ActionRow {
-                            set_title: "my.gov.uz",
-                            add_suffix = &gtk::LinkButton::builder()
-                                .uri("https://my.gov.uz/uz")
-                                .child(&gtk::Image::from_icon_name("document-send-symbolic"))
-                                .build(),
-                        },
+                set_content = &gtk::Box {
+                    set_orientation: gtk::Orientation::Vertical,
+                    set_spacing: 12,
+                    set_margin_all: 24,
+                    
+                    gtk::Image {
+                        set_vexpand: true,
+                        set_hexpand: true,
+                        set_paintable: Some(&embedded_logo()),
+                        set_pixel_size: 125,
+                    },
+
+                    gtk::Label {
+                        set_label: "Fractal",
+                        add_css_class: "title-1",
+                    },
+
+                    gtk::Label {
+                        set_label: "Fraktal jamoasi",
+                    },
+
+                    gtk::Button {
+                        set_label: "13",
+                        add_css_class: "accent",
+                        add_css_class: "pill",
+                        set_halign: gtk::Align::Center,
+                        inline_css: "
+                            padding: 6px 20px; 
+                            min-height: 0px; 
+                            min-width: 0px;
+                            label { 
+                                margin: 0px; 
+                                padding: 0px; 
+                            }
+                        ",
+                    },
+
+                    gtk::ListBox {
+                        add_css_class: "boxed-list",
+                        set_margin_top: 20,
 
                         adw::ActionRow {
-                            set_title: "ahost.uz",
-                            add_suffix = &gtk::LinkButton::builder()
-                                .uri("https://clients.ahost.uz/login")
-                                .child(&gtk::Image::from_icon_name("document-send-symbolic"))
-                                .build(),
-                        },
+                            set_title: "Veb sayt",
+                            // set_activatable: true,
+                            // connect_activated => |_| {
 
-                        adw::ActionRow {
-                            set_title: "id.egov.uz",
-                            add_suffix = &gtk::LinkButton::builder()
-                                .uri("https://id.egov.uz/oz")
-                                .child(&gtk::Image::from_icon_name("document-send-symbolic"))
-                                .build(),
+                            // },
+                            // set_subtitle: "Yagona interaktiv davlat xizmatlari portali",
+                            
+                            add_suffix = &gtk::LinkButton {
+                                set_uri: "https://my.gov.uz/uz",
+                                #[wrap(Some)]
+                                set_child = &gtk::Image {
+                                    set_icon_name: Some("external-link-symbolic"),
+                                    inline_css: "color: white;",
+                                }
+                            },  
                         },
-
-                        adw::ActionRow {
-                            set_title: "didox.uz",
-                            add_suffix = &gtk::LinkButton::builder()
-                                .uri("https://didox.uz/login_with_signature")
-                                .child(&gtk::Image::from_icon_name("document-send-symbolic"))
-                                .build(),
-                        },
-
-                        adw::ActionRow {
-                            set_title: "birdarcha.uz",
-                            add_suffix = &gtk::LinkButton::builder()
-                                .uri("https://new.birdarcha.uz/login")
-                                .child(&gtk::Image::from_icon_name("document-send-symbolic"))
-                                .build(),
-                        },
-
-                        adw::ActionRow {
-                            set_title: "e-invoice.uz",
-                            add_suffix = &gtk::LinkButton::builder()
-                                .uri("https://e-invoice.uz/register/")
-                                .child(&gtk::Image::from_icon_name("document-send-symbolic"))
-                                .build(),
-                        },
-
-                        adw::ActionRow {
-                            set_title: "my.mehnat.uz",
-                            add_suffix = &gtk::LinkButton::builder()
-                                .uri("https://my.mehnat.uz/login#")
-                                .child(&gtk::Image::from_icon_name("document-send-symbolic"))
-                                .build(),
-                        },
-                    }
-                }
-            }
+                    },
+                },
+            },
         }
     }
 
