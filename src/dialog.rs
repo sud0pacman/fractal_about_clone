@@ -77,6 +77,7 @@ impl SimpleComponent for AwesomeModel {
                         ",
                     },
 
+                    // PreferencesPage || PreferencesGroup => EntryRow => ActionRow
                     gtk::ListBox {
                         add_css_class: "boxed-list",
                         set_margin_top: 30,

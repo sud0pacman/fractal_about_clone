@@ -82,3 +82,4 @@ fn main() {
     let app = RelmApp::new("relm4.example.components");
     app.run::<App>(());
 }
+
