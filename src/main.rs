@@ -1,6 +1,7 @@
 use relm4::{adw, gtk::prelude::*, prelude::*};
 
 mod dialog;
+mod credits;
 use dialog::{AwesomeModel, DialogMsg};
 
 #[derive(Debug)]
@@ -23,23 +24,14 @@ impl SimpleComponent for App {
         #[root]
         adw::ApplicationWindow
         {
-            set_default_size: (500, 250),
+            set_default_size: (500, 800),
 
             gtk::Box {
                 set_orientation: gtk::Orientation::Vertical,
-                // adw::HeaderBar {
-                //     // set_titlebar: Some(model.header.widget()),
-
-                // },
                 adw::ToolbarView {
                     set_top_bar_style: adw::ToolbarStyle::Flat,
 
-                    add_top_bar = &adw::HeaderBar {
-                        // #[wrap(Some)]
-                        // set_title_widget = &adw::WindowTitle {
-                        //     set_title: "Wifi",
-                        // }
-                    },
+                    add_top_bar = &adw::HeaderBar {},
                     gtk::LinkButton {
                         set_label: "hi",
                         connect_clicked => AppMsg::AwesomeModel,
